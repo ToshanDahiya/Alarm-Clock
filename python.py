@@ -3,61 +3,76 @@ import datetime
 import time
 from threading import *
 import subprocess
+import sys
+import os
 
-# Create Object
-root = Tk()
+# Creating Object using Tkinter
+clock = Tk()
  
-# Set geometry
-root.geometry("400x200")
+# Set geometry of the alarm clock
+clock.geometry("450x250")
 
-# Use Threading
+# Use Threading for the clock
 def Threading():
-    t1=Thread(target=alarm)
-    t1.start()
+    al=Thread(target=alarmclock)
+    al.start()
  
-def alarm():
-    # Infinite Loop
-    alarmSet = "Alarm set successfully"
-    alarmSetlabel = Label(root,text=alarmSet,font=("Helvetica 15 bold")).pack()
+def alarmclock():
+
+    setAlarmButton.config(state="disabled")
+
+    set_alarm = "Alarm set successfully"
+    alarmSetlabel = Label(clock,text=set_alarm,font=("Helvetica 15 bold"))
+    alarmSetlabel.pack()
+    disableAlarmButton.config(state="normal")
+    
+    
     while True:
         # Set Alarm
-        set_alarm_time = f"{hour.get()}:{minute.get()}:{second.get()}"
+        set_alarm_time = f"{hr.get()}:{min.get()}:{sec.get()}"
  
         # Wait for one seconds
         time.sleep(1)
  
         # Get current time
         current_time = datetime.datetime.now().strftime("%H:%M:%S")
-        print(current_time,set_alarm_time)
+        # print(current_time,set_alarm_time)
  
         # Check whether set alarm is equal to current time or not
         if current_time == set_alarm_time:
-            print("Time to Wake up")
-            # root.after(8000, alarmSetlabel.destroy)
-    
-
+            clock.after(1, alarmSetlabel.destroy)
+            wakeUpLabel = Label(clock,text="Time to Wake up",font=("Helvetica 15 bold"))
+            wakeUpLabel.pack()
             for i in range(5):
                 sound = subprocess.call(["afplay", "perfect.mp3"])
-            break
+            clock.after(1, wakeUpLabel.destroy)
+            setAlarmButton.config(state="normal")
+            disableAlarmButton.config(state="disabled")
+            return None
 
+def restart_program():
+    python = sys.executable
+    os.execl(python, python, * sys.argv)
+    
+                                    
 # Add Labels, Frame, Button, Optionmenus
-Label(root,text="Alarm Clock",font=("Helvetica 20 bold"),fg="red").pack(pady=10)
-Label(root,text="Set Time",font=("Helvetica 15 bold")).pack()
+Label(clock,text="Alarm Clock",font=("Helvetica 20 bold"),fg="red").pack(pady=10)
+Label(clock,text="Set Time",font=("Helvetica 15 bold")).pack()
  
-frame = Frame(root)
-frame.pack()
+design = Frame(clock)
+design.pack()
  
-hour = StringVar(root)
+hr = StringVar(clock)
 hours = ('00', '01', '02', '03', '04', '05', '06', '07',
          '08', '09', '10', '11', '12', '13', '14', '15',
          '16', '17', '18', '19', '20', '21', '22', '23'
         )
-hour.set(hours[0])
+hr.set(hours[0])
  
-hrs = OptionMenu(frame, hour, *hours)
+hrs = OptionMenu(design, hr, *hours)
 hrs.pack(side=LEFT)
  
-minute = StringVar(root)
+min = StringVar(clock)
 minutes = ('00', '01', '02', '03', '04', '05', '06', '07',
            '08', '09', '10', '11', '12', '13', '14', '15',
            '16', '17', '18', '19', '20', '21', '22', '23',
@@ -65,13 +80,13 @@ minutes = ('00', '01', '02', '03', '04', '05', '06', '07',
            '32', '33', '34', '35', '36', '37', '38', '39',
            '40', '41', '42', '43', '44', '45', '46', '47',
            '48', '49', '50', '51', '52', '53', '54', '55',
-           '56', '57', '58', '59', '60')
-minute.set(minutes[0])
+           '56', '57', '58', '59')
+min.set(minutes[0])
  
-mins = OptionMenu(frame, minute, *minutes)
+mins = OptionMenu(design, min, *minutes)
 mins.pack(side=LEFT)
  
-second = StringVar(root)
+sec = StringVar(clock)
 seconds = ('00', '01', '02', '03', '04', '05', '06', '07',
            '08', '09', '10', '11', '12', '13', '14', '15',
            '16', '17', '18', '19', '20', '21', '22', '23',
@@ -79,15 +94,21 @@ seconds = ('00', '01', '02', '03', '04', '05', '06', '07',
            '32', '33', '34', '35', '36', '37', '38', '39',
            '40', '41', '42', '43', '44', '45', '46', '47',
            '48', '49', '50', '51', '52', '53', '54', '55',
-           '56', '57', '58', '59', '60')
-second.set(seconds[0])
+           '56', '57', '58', '59')
+sec.set(seconds[0])
  
-secs = OptionMenu(frame, second, *seconds)
+secs = OptionMenu(design, sec, *seconds)
 secs.pack(side=LEFT)
  
-setAlarm = "Set Alarm"
+SetAlarm = "Set Alarm"
 
-Button(root,text=setAlarm,font=("Helvetica 15"),command=Threading).pack(pady=20)
- 
+buttonFrame = Frame(clock)
+buttonFrame.pack()
+setAlarmButton = Button(buttonFrame,text=SetAlarm,font=("Helvetica 15"),command=Threading)
+setAlarmButton.pack(pady=20, side=LEFT)
+disableAlarmButton = Button(buttonFrame,text="Stop",font=("Helvetica 15"),command=restart_program)
+disableAlarmButton.pack(pady=20)
+disableAlarmButton.config(state="disabled")
+
 # Execute Tkinter
-root.mainloop()
+clock.mainloop()
